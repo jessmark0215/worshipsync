@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in · WorshipSync</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <p class="auth-brand-name">WorshipSync</p>
+    </div>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub">Log in to manage your worship team schedule.</p>
+
+    <div id="configWarning" class="config-warning" hidden>
+      <i data-lucide="alert-triangle"></i>
+      <div>
+        <strong>Firebase not configured</strong>
+        Edit <code>js/shared/firebase-config.js</code> with your project's values to enable authentication.
+      </div>
+    </div>
+
+    <form class="auth-form" id="loginForm" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="email">Email address</label>
+        <div class="auth-input-wrap">
+          <i data-lucide="mail" class="auth-input-icon"></i>
+          <input class="auth-input" id="email" type="email" autocomplete="email" required placeholder="you@church.org" />
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="password">
+          <span>Password</span>
+        </label>
+        <div class="auth-input-wrap">
+          <i data-lucide="lock" class="auth-input-icon"></i>
+          <input class="auth-input" id="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+          <button type="button" class="auth-show-pwd" id="togglePwd" aria-label="Show password">
+            <i data-lucide="eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="loginError" class="auth-error" hidden>
+        <i data-lucide="alert-circle"></i>
+        <span id="loginErrorText"></span>
+      </div>
+
+      <button type="submit" class="auth-submit" id="submitBtn">
+        <span id="submitText">Log in</span>
+        <i data-lucide="arrow-right" id="submitIcon"></i>
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <p class="auth-switch">
+      Don't have an account? <a href="signup.html">Create one</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { initFirebase, logIn, friendlyAuthError, onAuthReady } from './js/shared/auth.js';
+    import { isFirebaseConfigured } from './js/shared/firebase-config.js';
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Show config warning if Firebase isn't set up yet
+    if (!isFirebaseConfigured()) {
+      document.getElementById('configWarning').hidden = false;
+    }
+
+    // If already logged in, redirect to dashboard
+    if (isFirebaseConfigured()) {
+      onAuthReady((user) => {
+        if (user && user.emailVerified) {
+          location.href = 'index.html';
+        } else if (user && !user.emailVerified) {
+          location.href = 'verify-email.html';
+        }
+      });
+    }
+
+    // Toggle password visibility
+    const pwdInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePwd');
+    toggleBtn.addEventListener('click', () => {
+      const isPwd = pwdInput.type === 'password';
+      pwdInput.type = isPwd ? 'text' : 'password';
+      toggleBtn.innerHTML = `<i data-lucide="${isPwd ? 'eye-off' : 'eye'}"></i>`;
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    // Submit handler
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitIcon = document.getElementById('submitIcon');
+    const errorBox = document.getElementById('loginError');
+    const errorText = document.getElementById('loginErrorText');
+
+    function showError(msg) {
+      errorText.textContent = msg;
+      errorBox.hidden = false;
+    }
+    function clearError() { errorBox.hidden = true; }
+
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      if (loading) {
+        submitText.textContent = 'Logging in…';
+        submitIcon.outerHTML = '<span class="spinner" id="submitIcon"></span>';
+      } else {
+        submitText.textContent = 'Log in';
+        document.getElementById('submitIcon').outerHTML = '<i data-lucide="arrow-right" id="submitIcon"></i>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      if (!isFirebaseConfigured()) {
+        showError('Firebase isn\'t configured yet. See the warning above.');
+        return;
+      }
+      const email = document.getElementById('email').value.trim();
+      const password = pwdInput.value;
+      if (!email || !password) {
+        showError('Please fill in both fields.');
+        return;
+      }
+      setLoading(true);
+      try {
+        const user = await logIn({ email, password });
+        if (!user.emailVerified) {
+          location.href = 'verify-email.html';
+        } else {
+          location.href = 'index.html';
+        }
+      } catch (err) {
+        showError(friendlyAuthError(err));
+        setLoading(false);
+      }
+    });
+
+    // Pre-initialize Firebase in the background so the first submit is faster
+    if (isFirebaseConfigured()) {
+      initFirebase().catch(() => {});
+    }
+  </script>
+</body>
+</html>

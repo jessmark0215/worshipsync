@@ -1,0 +1,100 @@
+// ============================================================
+// firestore.rules
+// ------------------------------------------------------------
+// PASTE THIS INTO Firebase Console → Firestore Database → Rules
+// These rules REPLACE the default 30-day test-mode rules so your
+// data is permanent.
+//
+// HOW TO INSTALL:
+// 1. Firebase Console → your project → Build → Firestore Database
+// 2. Click "Create database" if you haven't yet
+//    - Pick region: asia-southeast1 (Singapore — closest to Cebu)
+//    - Choose "Start in production mode"
+// 3. Click the "Rules" tab
+// 4. Replace everything with the rules below
+// 5. Click "Publish"
+// ============================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+    function myUid() {
+      return request.auth.uid;
+    }
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/accounts/$(myUid()))
+        && get(/databases/$(database)/documents/accounts/$(myUid())).data.isAdmin == true;
+    }
+
+    // ACCOUNTS — user profiles
+    match /accounts/{userId} {
+      allow read: if isVerified();
+
+      // Bootstrap: any signed-in user can create the seed admin doc
+      allow create: if isSignedIn() && userId == 'u_admin';
+
+      // Own account: a signed-in user (verified OR unverified) can create their
+      // own account doc. This is required so admins can see new users in the
+      // MD/WL/musician picker IMMEDIATELY after signup, before email verification.
+      // The user cannot self-promote to admin.
+      allow create: if isSignedIn()
+        && userId == myUid()
+        && request.resource.data.isAdmin == false
+        && request.resource.data.isSeedAdmin == false;
+
+      // Own account updates require verification + can't change admin flags
+      allow update: if isVerified()
+        && userId == myUid()
+        && request.resource.data.isAdmin == resource.data.isAdmin
+        && request.resource.data.isSeedAdmin == resource.data.isSeedAdmin;
+
+      // Admins can do anything to any account
+      allow read, write: if isAdmin();
+    }
+
+    // EVENTS
+    match /events/{eventId} {
+      allow read: if isVerified();
+      allow create, delete: if isAdmin();
+      allow update: if isVerified();
+    }
+
+    // RECURRING TEMPLATES
+    match /templates/{templateId} {
+      allow read: if isVerified();
+      allow write: if isAdmin();
+    }
+
+    // NOTIFICATIONS
+    match /notifications/{notifId} {
+      allow read: if isVerified();
+      allow create: if isVerified();
+      allow update: if isVerified();
+      allow delete: if isAdmin();
+    }
+
+    // ARCHIVE
+    match /archive/{eventId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ANALYTICS
+    match /analytics/{userId} {
+      allow read: if isAdmin() || (isVerified() && userId == myUid());
+      allow write: if isVerified() && userId == myUid();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
