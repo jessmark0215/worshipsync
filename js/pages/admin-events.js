@@ -10,6 +10,7 @@ import {
   categorizeEvents, addOneOffEvent, updateEvent, deleteEvent, archiveEvent,
   addTemplate, updateTemplate, deleteTemplate, generateFromTemplate, nextOccurrences,
   weekdayName, onDataChange,
+  formatRehearsal, parseLegacyRehearsal,
 } from '../shared/data.js';
 import { initShell } from '../shared/shell.js';
 
@@ -304,10 +305,27 @@ function openOneOffModal(eventId = null) {
         <input class="modal-input" id="evLocation" type="text" placeholder="Main Sanctuary" value="${esc(editing?.location || 'Main Sanctuary')}" />
       </div>
 
-      <div class="modal-field">
-        <label class="modal-label">Rehearsal (optional)</label>
-        <input class="modal-input" id="evRehearsal" type="text" placeholder="Saturday, Dec 23 · 6:00 PM" value="${esc(editing?.rehearsal || '')}" />
-      </div>
+      ${(() => {
+        // Rehearsal uses the same date+time layout as the event above.
+        // Pre-fill from structured fields when available, otherwise fall
+        // back to parsing the legacy free-text `rehearsal` string so older
+        // events still re-populate sensibly when edited.
+        const legacy = (editing?.rehearsalDate || editing?.rehearsalTime)
+          ? { date: editing?.rehearsalDate || '', time: editing?.rehearsalTime || '' }
+          : parseLegacyRehearsal(editing?.rehearsal || '');
+        return `
+          <div class="modal-row">
+            <div class="modal-field">
+              <label class="modal-label">Rehearsal date (optional)</label>
+              <input class="modal-input" id="evRehearsalDate" type="date" value="${esc(legacy.date)}" />
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">Rehearsal time</label>
+              <input class="modal-input" id="evRehearsalTime" type="text" placeholder="6:00 PM" value="${esc(legacy.time)}" />
+            </div>
+          </div>
+        `;
+      })()}
 
       <div class="modal-row">
         <div class="modal-field">
@@ -342,7 +360,9 @@ function openOneOffModal(eventId = null) {
         const date = $('#evDate', modal).value;
         const time = $('#evTime', modal).value.trim();
         const location = $('#evLocation', modal).value.trim();
-        const rehearsal = $('#evRehearsal', modal).value.trim();
+        const rehearsalDate = $('#evRehearsalDate', modal).value;
+        const rehearsalTime = $('#evRehearsalTime', modal).value.trim();
+        const rehearsal = formatRehearsal(rehearsalDate, rehearsalTime);
         const mdName = $('#evMD', modal).value;
         const wlName = $('#evWL', modal).value;
 
@@ -370,12 +390,12 @@ function openOneOffModal(eventId = null) {
               status: 'pending',
             });
           }
-          updateEvent(editing.id, { title, date, time, location, rehearsal, team: newTeam });
+          updateEvent(editing.id, { title, date, time, location, rehearsal, rehearsalDate, rehearsalTime, team: newTeam });
           closeModal();
           render();
           showToast('Event updated');
         } else {
-          addOneOffEvent({ title, date, time, location, rehearsal, mdName, worshipLeaderName: wlName });
+          addOneOffEvent({ title, date, time, location, rehearsal, rehearsalDate, rehearsalTime, mdName, worshipLeaderName: wlName });
           closeModal();
           render();
           showToast(`"${title}" created`);

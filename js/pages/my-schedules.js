@@ -9,6 +9,7 @@ import {
   persist, persistEvent, memberFitsRole, pushNotification,
   markNotificationRead, markAllNotificationsRead,
   getEventsForUser, setMyEventStatus, getMyNotifications, onDataChange,
+  formatRehearsal, parseLegacyRehearsal,
 } from '../shared/data.js';
 import { initShell } from '../shared/shell.js';
 import { renderVerseCard, bindVerseRefresh } from '../shared/verse.js';
@@ -397,26 +398,40 @@ function renderAddTeamSlot(eventId) {
 // REHEARSAL
 // ============================================================
 function renderRehearsalSection(event, editing) {
+  // For the edit form we want the structured (date, time) pair to populate
+  // the inputs. Fall back to parsing the legacy display string for events
+  // that still only have `event.rehearsal` set.
+  const legacy = (event.rehearsalDate || event.rehearsalTime)
+    ? { date: event.rehearsalDate || '', time: event.rehearsalTime || '' }
+    : parseLegacyRehearsal(event.rehearsal || '');
+
   return `
     <section class="sub">
       <div class="rehearsal-banner">
         <div class="rehearsal-info">
           <div class="rehearsal-icon"><i data-lucide="calendar-clock"></i></div>
-          <div>
+          <div class="rehearsal-body">
             <div class="rehearsal-label">Rehearsal</div>
             ${editing ? `
               <div class="rehearsal-edit-row">
-                <input type="text" class="rehearsal-edit-input"
-                       value="${esc(event.rehearsal)}"
-                       data-edit-rehearsal="${event.id}"
-                       placeholder="e.g. Saturday, Dec 7 · 6:00 PM" />
+                <input type="date"
+                       class="rehearsal-edit-input rehearsal-edit-date"
+                       value="${esc(legacy.date)}"
+                       data-edit-rehearsal-date="${event.id}"
+                       aria-label="Rehearsal date" />
+                <input type="text"
+                       class="rehearsal-edit-input rehearsal-edit-time"
+                       value="${esc(legacy.time)}"
+                       data-edit-rehearsal-time="${event.id}"
+                       placeholder="6:00 PM"
+                       aria-label="Rehearsal time" />
               </div>
             ` : `
-              <div class="rehearsal-time">${esc(event.rehearsal)}</div>
+              <div class="rehearsal-time">${esc(event.rehearsal) || '<span class="rehearsal-empty">No rehearsal scheduled</span>'}</div>
             `}
           </div>
         </div>
-        ${!editing ? `
+        ${!editing && event.rehearsal ? `
           <button class="btn btn-primary btn-sm"><i data-lucide="calendar-plus"></i>Add to calendar</button>
         ` : ''}
       </div>
@@ -1062,26 +1077,44 @@ function bindAll() {
     });
   });
 
-  // Edit rehearsal
-  $$('[data-edit-rehearsal]').forEach(input => {
-    input.addEventListener('input', () => {
-      const id = parseInt(input.dataset.editRehearsal);
-      const event = getEvent(id);
-      if (event) event.rehearsal = input.value;
+  // Edit rehearsal — date + time inputs live next to each other. We update
+  // the structured fields on every input event (so a quick blur doesn't lose
+  // data), then on blur of EITHER field we recompute the display string,
+  // persist, notify, and toast.
+  function applyRehearsalEdit(eventId, sourceLabel) {
+    const event = getEvent(eventId);
+    if (!event) return;
+    // Re-derive from whatever inputs exist in the DOM for this event (so we
+    // pick up the latest value even if the user is mid-edit on one field).
+    const dateEl = $(`[data-edit-rehearsal-date="${eventId}"]`);
+    const timeEl = $(`[data-edit-rehearsal-time="${eventId}"]`);
+    const date = dateEl ? dateEl.value : (event.rehearsalDate || '');
+    const time = timeEl ? timeEl.value.trim() : (event.rehearsalTime || '');
+    event.rehearsalDate = date;
+    event.rehearsalTime = time;
+    event.rehearsal = formatRehearsal(date, time);
+    persistEvent(eventId);
+    notif({
+      eventId,
+      icon: 'calendar-clock',
+      tone: 'amber',
+      text: event.rehearsal
+        ? `Rehearsal updated for <strong>${esc(event.title)}</strong>: ${esc(event.rehearsal)}.`
+        : `Rehearsal cleared for <strong>${esc(event.title)}</strong>.`,
     });
+    showToast(`Rehearsal ${event.rehearsal ? 'updated' : 'cleared'}`);
+  }
+
+  $$('[data-edit-rehearsal-date]').forEach(input => {
+    // Date pickers fire 'change' (not 'input') when the user picks a date,
+    // so we treat that as the commit point for the date input.
+    input.addEventListener('change', () => {
+      applyRehearsalEdit(parseInt(input.dataset.editRehearsalDate), 'date');
+    });
+  });
+  $$('[data-edit-rehearsal-time]').forEach(input => {
     input.addEventListener('blur', () => {
-      const id = parseInt(input.dataset.editRehearsal);
-      const event = getEvent(id);
-      persistEvent(id);
-      if (event) {
-        notif({
-          eventId: id,
-          icon: 'calendar-clock',
-          tone: 'amber',
-          text: `Rehearsal updated for <strong>${esc(event.title)}</strong>: ${esc(event.rehearsal)}.`,
-        });
-      }
-      showToast('Rehearsal updated');
+      applyRehearsalEdit(parseInt(input.dataset.editRehearsalTime), 'time');
     });
   });
 
@@ -1131,7 +1164,46 @@ function bindNotifCard() {
   await initShell();
   render();
   checkHashFocus();
+
   // Re-render when any Firestore data changes so schedule updates from admins
   // (assignments, setlist edits, new events) appear instantly without refresh.
-  onDataChange(() => render());
+  // Caveat: if the user is currently typing in an inline editor (song fields,
+  // rehearsal date/time, etc.) or interacting with a modal, a render() call
+  // would tear down their input mid-keystroke. In those cases we defer the
+  // render until the input blurs.
+  let _renderPending = false;
+  onDataChange(() => {
+    const el = document.activeElement;
+    const editingInline = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') &&
+      el.dataset && (
+        el.dataset.songEdit ||
+        el.dataset.editRehearsalDate ||
+        el.dataset.editRehearsalTime
+      );
+    const modalOpen = !!document.getElementById('modalRoot');
+    if (editingInline || modalOpen) {
+      if (_renderPending) return;
+      _renderPending = true;
+      const flush = () => {
+        _renderPending = false;
+        // Only render if nothing's still in progress; otherwise rebook.
+        const stillEditing = document.activeElement && document.activeElement.dataset && (
+          document.activeElement.dataset.songEdit ||
+          document.activeElement.dataset.editRehearsalDate ||
+          document.activeElement.dataset.editRehearsalTime
+        );
+        const stillModal = !!document.getElementById('modalRoot');
+        if (stillEditing || stillModal) {
+          _renderPending = true;
+          setTimeout(flush, 400);
+        } else {
+          render();
+        }
+      };
+      if (editingInline) el.addEventListener('blur', flush, { once: true });
+      else setTimeout(flush, 400);
+      return;
+    }
+    render();
+  });
 })();

@@ -29,6 +29,57 @@ export function parseLocalDate(iso) {
 }
 
 // ============================================================
+// REHEARSAL FORMATTING
+// ============================================================
+// Rehearsals are stored as a structured pair (rehearsalDate, rehearsalTime)
+// plus a derived display string `rehearsal` for backward compatibility with
+// any code that reads it as text. The display string is always rebuilt on
+// save from the structured fields — never hand-edited.
+
+// Build the display string from a date + time. Mirrors the event-card
+// formatting so rehearsals read like "Saturday, Dec 23 · 6:00 PM".
+export function formatRehearsal(dateIso, time) {
+  if (!dateIso && !time) return '';
+  if (!dateIso) return time || '';
+  const d = parseLocalDate(dateIso);
+  if (!d) return time || '';
+  const datePart = d.toLocaleDateString('en', {
+    weekday: 'long', month: 'short', day: 'numeric'
+  });
+  return time ? `${datePart} · ${time}` : datePart;
+}
+
+// Best-effort parse of the legacy free-text rehearsal field so older events
+// pre-populate the new date/time inputs when edited. Recognizes the format
+// produced by formatRehearsal above ("Weekday, Mon DD · TIME") plus a few
+// loose variants. Returns { date: 'YYYY-MM-DD' | '', time: 'H:MM AM' | '' }.
+export function parseLegacyRehearsal(str) {
+  if (!str || typeof str !== 'string') return { date: '', time: '' };
+  const text = str.trim();
+  if (!text) return { date: '', time: '' };
+
+  // Split on " · " separator if present
+  let datePart = text, timePart = '';
+  if (text.includes(' · ')) {
+    [datePart, timePart] = text.split(' · ').map(s => s.trim());
+  } else {
+    // Otherwise pull a trailing time off the end (e.g. "Saturday, Dec 23 6:00 PM")
+    const m = text.match(/^(.*?)\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*$/i);
+    if (m) { datePart = m[1].trim(); timePart = m[2].trim(); }
+  }
+
+  // Try parsing the date part as a natural date. We tack on the current year
+  // if no year is present, so "Saturday, Dec 23" lands in this year.
+  let dateIso = '';
+  const cleaned = datePart.replace(/^[A-Za-z]+,\s*/, ''); // drop leading "Saturday, "
+  const withYear = /\b\d{4}\b/.test(cleaned) ? cleaned : `${cleaned} ${new Date().getFullYear()}`;
+  const parsed = new Date(withYear);
+  if (!isNaN(parsed.getTime())) dateIso = toLocalISODate(parsed);
+
+  return { date: dateIso, time: timePart || '' };
+}
+
+// ============================================================
 // SEED DATA — minimal. Fake fixtures removed.
 // ============================================================
 
@@ -736,6 +787,8 @@ function newEventShell({ id, title, date, time, location, isRecurring = false, t
     recurring: isRecurring,
     templateId,
     rehearsal: '',
+    rehearsalDate: '',
+    rehearsalTime: '',
     setlist: [],
     team: [],
   };
@@ -747,9 +800,11 @@ function nextEventId() {
 }
 
 // Add a manual (one-off) event
-export function addOneOffEvent({ title, date, time, location, rehearsal, mdName, worshipLeaderName }) {
+export function addOneOffEvent({ title, date, time, location, rehearsal, rehearsalDate, rehearsalTime, mdName, worshipLeaderName }) {
   const ev = newEventShell({ title, date, time, location, isRecurring: false });
   ev.rehearsal = rehearsal || '';
+  ev.rehearsalDate = rehearsalDate || '';
+  ev.rehearsalTime = rehearsalTime || '';
 
   // Push event first so notifications can reference its id
   _state.events.push(ev);
@@ -926,6 +981,7 @@ export function generateFromTemplate(templateId, count = 4) {
     // Rehearsal date = event date + offset
     const rehearsal = new Date(d);
     rehearsal.setDate(rehearsal.getDate() + (t.rehearsalDayOffset ?? -1));
+    const rehearsalIso = toLocalISODate(rehearsal);
     const rehearsalStr = rehearsal.toLocaleString('en', { weekday: 'long', month: 'short', day: 'numeric' }) + ' · ' + t.rehearsalTime;
 
     const ev = newEventShell({
@@ -937,6 +993,8 @@ export function generateFromTemplate(templateId, count = 4) {
       templateId: t.id,
     });
     ev.rehearsal = rehearsalStr;
+    ev.rehearsalDate = rehearsalIso;
+    ev.rehearsalTime = t.rehearsalTime || '';
 
     // Auto-fill MD + WL from rotation, each starting as 'pending' for them.
     const mdUser = _consumeRotation(t, 'md');

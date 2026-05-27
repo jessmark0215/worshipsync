@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calendar of events · WorshipSync</title>
+  <meta name="description" content="Full church calendar — every service, rehearsal, and special event" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,12 +15,15 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/calendar.css">
 </head>
 <body>
 
   <div class="app">
 
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
+
       <div class="brand">
         <div class="brand-mark">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -66,6 +70,7 @@
 
     </aside>
 
+    <!-- ===== MAIN ===== -->
     <main class="main">
       <header class="topbar">
         <button class="icon-btn menu-btn" id="menuOpen" aria-label="Open menu">
@@ -94,24 +99,12 @@
         </div>
       </header>
 
-      <div class="page">
-        <div class="coming-soon">
-          <div class="coming-soon-mark"><i data-lucide="calendar-days"></i></div>
-          <h2>Calendar of events — coming soon</h2>
-          <p>We're building this page next. For now, head back to your schedules.</p>
-          <a class="btn btn-primary" href="index.html">
-            <i data-lucide="arrow-left"></i>Back to my schedules
-          </a>
-        </div>
-      </div>
+      <div class="page" id="page"></div>
     </main>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
   </div>
 
-  <script type="module">
-    import { initShell } from './js/shared/shell.js';
-    (async () => { await initShell(); })();
-  </script>
+  <script type="module" src="js/pages/calendar.js"></script>
 </body>
 </html>
