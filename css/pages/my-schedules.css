@@ -1,0 +1,767 @@
+/* ============================================================
+   WORSHIPSYNC · pages/my-schedules.css
+   Styles specific to the My Schedules page.
+   ============================================================ */
+
+/* ===== Dashboard layout ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--gap);
+  align-items: start;
+}
+
+/* ============================================================
+   EVENT CARDS (expandable)
+   ============================================================ */
+.event-card {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s;
+}
+.event-card.open { box-shadow: var(--shadow-md); }
+
+.event-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  text-align: left;
+  transition: background 0.15s;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+.event-card-head:hover { background: var(--card-soft); }
+
+.event-date {
+  flex-shrink: 0;
+  width: 56px;
+  text-align: center;
+  padding: 10px 0;
+  background: var(--accent-soft);
+  border-radius: var(--r-md);
+  transition: all 0.2s;
+}
+.event-card.open .event-date { background: var(--accent); }
+.event-date-month {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-text);
+}
+.event-card.open .event-date-month { color: rgba(255,255,255,0.85); }
+.event-date-day {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-text);
+  line-height: 1;
+  margin-top: 2px;
+}
+.event-card.open .event-date-day { color: white; }
+
+.event-info { flex: 1; min-width: 0; }
+.event-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.event-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+.event-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  flex-wrap: wrap;
+}
+.event-meta-item { display: inline-flex; align-items: center; gap: 5px; }
+.event-meta-item i { width: 13px; height: 13px; stroke-width: 1.8; color: var(--text-3); }
+
+.event-chev {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--card-soft);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.event-card.open .event-chev {
+  background: var(--sidebar);
+  color: white;
+  border-color: transparent;
+  transform: rotate(180deg);
+}
+.event-chev i { width: 16px; height: 16px; stroke-width: 2; }
+
+/* Expandable body */
+.event-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.event-card.open .event-body { grid-template-rows: 1fr; }
+.event-body-inner {
+  overflow: hidden;
+  padding: 0 24px;
+}
+.event-card.open .event-body-inner { padding: 0 24px 24px; }
+
+.event-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 -24px 24px;
+}
+
+/* Subsection */
+.sub { margin-bottom: 22px; }
+.sub:last-child { margin-bottom: 0; }
+.sub-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.sub-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+.sub-meta { font-size: 12px; color: var(--text-3); }
+
+/* ============================================================
+   DECISION CARD (Accept / Decline)
+   ============================================================ */
+.decision-card {
+  background: linear-gradient(135deg, #FFF7E6, #FEF3C7);
+  border: 1px solid #FCD34D;
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.decision-card.md {
+  background: linear-gradient(135deg, #EFEAFE, #E5DDFB);
+  border-color: #C4B5FD;
+}
+.decision-icon {
+  width: 44px; height: 44px;
+  background: white;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  color: var(--amber);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.decision-card.md .decision-icon { color: var(--accent); }
+.decision-icon i { width: 22px; height: 22px; stroke-width: 1.8; }
+.decision-text { flex: 1; min-width: 200px; }
+.decision-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.3;
+}
+.decision-sub {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.decision-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Declined notice */
+.declined-notice {
+  background: var(--rose-soft);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.declined-notice i { width: 18px; height: 18px; color: var(--rose); flex-shrink: 0; }
+.declined-notice-text {
+  font-size: 13px;
+  color: #9F1239;
+  flex: 1;
+}
+.declined-notice-text strong { font-weight: 700; }
+.declined-notice button {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9F1239;
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+}
+
+/* ============================================================
+   MD CONTROLS BAR
+   ============================================================ */
+.md-controls-bar {
+  background: linear-gradient(135deg, #15131F, #1E1B2C);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.md-controls-bar::before {
+  content: '';
+  position: absolute;
+  top: -30%; right: -10%;
+  width: 200px; height: 200%;
+  background: radial-gradient(ellipse, rgba(124, 91, 242, 0.3) 0%, transparent 60%);
+  pointer-events: none;
+}
+.md-controls-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--accent);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  color: white;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-purple);
+}
+.md-controls-icon i { width: 18px; height: 18px; stroke-width: 2; }
+.md-controls-text { flex: 1; min-width: 180px; position: relative; z-index: 1; }
+.md-controls-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+.md-controls-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SONG CARDS (setlist)
+   ============================================================ */
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.song-card {
+  text-align: left;
+  width: 100%;
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  cursor: pointer;
+}
+.song-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--song-color, var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.song-card:hover {
+  background: white;
+  border-color: var(--song-color, var(--accent));
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.song-card:hover::before { transform: scaleX(1); }
+
+.song-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.song-key-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+.song-arrow {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  transition: all 0.2s;
+}
+.song-card:hover .song-arrow {
+  background: var(--accent);
+  color: white;
+  transform: translate(2px, -2px);
+}
+.song-arrow i { width: 13px; height: 13px; stroke-width: 2.4; }
+
+.song-card-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.song-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+  line-height: 1.25;
+}
+.song-artist {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+.song-foot i { width: 13px; height: 13px; stroke-width: 1.8; color: var(--text-3); }
+
+/* Editable song card */
+.song-card.editable {
+  cursor: default;
+  background: white;
+  border: 1px dashed var(--border-mid);
+}
+.song-card.editable:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--accent);
+}
+.song-card.editable::before { display: none; }
+.song-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.song-edit-field label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.song-edit-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-1);
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.song-edit-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 91, 242, 0.08);
+}
+.song-edit-input.mono { font-family: var(--font-mono); font-size: 12px; }
+
+.song-card-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+.song-action-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  font-family: inherit;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.song-action-btn i { width: 12px; height: 12px; }
+.song-action-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.song-action-btn.danger:hover {
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  color: #9F1239;
+}
+.song-action-btn.success {
+  background: var(--green-soft);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #065F46;
+}
+
+.song-uploaded {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #065F46;
+  font-weight: 600;
+}
+.song-uploaded i { width: 11px; height: 11px; }
+
+.song-card-add {
+  text-align: center;
+  background: transparent;
+  border: 1.5px dashed var(--border-mid);
+  border-radius: var(--r-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  min-height: 152px;
+}
+.song-card-add:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.song-card-add-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--card-soft);
+  display: grid; place-items: center;
+  color: var(--text-3);
+  transition: all 0.15s;
+}
+.song-card-add:hover .song-card-add-icon {
+  background: var(--accent);
+  color: white;
+}
+.song-card-add-icon i { width: 18px; height: 18px; }
+
+/* ============================================================
+   TEAM GRID (assigned musicians)
+   ============================================================ */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.team-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: all 0.15s;
+}
+.team-card:hover { background: white; border-color: var(--border-mid); }
+.team-card.you {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  border-width: 1.5px;
+}
+.team-card-text { min-width: 0; flex: 1; }
+.team-card-role {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.team-card.you .team-card-role { color: var(--accent); }
+.team-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.you-tag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 6px;
+  background: var(--accent);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* Empty / add-team slot */
+.team-card.empty {
+  background: transparent;
+  border: 1.5px dashed var(--border-mid);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.team-card.empty:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.team-card.empty .avatar {
+  background: var(--card-soft);
+  color: var(--text-3);
+}
+.team-card.empty .team-card-name {
+  color: var(--text-3);
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Protected (MD slot) */
+.team-card.protected {
+  background: var(--card-soft);
+  border-color: var(--border);
+  opacity: 0.9;
+}
+.team-card.protected .team-card-role::after {
+  content: ' · admin-set';
+  font-style: italic;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+/* Action button group on team card */
+.team-card-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.team-card-swap,
+.team-card-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.team-card-swap:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.team-card-remove:hover {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: white;
+}
+.team-card-swap i,
+.team-card-remove i { width: 12px; height: 12px; }
+
+/* ============================================================
+   REHEARSAL BANNER
+   ============================================================ */
+.rehearsal-banner {
+  background: var(--sidebar);
+  color: white;
+  border-radius: var(--r-md);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.rehearsal-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 280px; height: 200%;
+  background: radial-gradient(ellipse, rgba(124, 91, 242, 0.25) 0%, transparent 60%);
+  pointer-events: none;
+}
+.rehearsal-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.rehearsal-icon {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border-radius: 12px;
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-purple);
+}
+.rehearsal-icon i { width: 20px; height: 20px; color: white; stroke-width: 2; }
+.rehearsal-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-on-dark-3);
+}
+.rehearsal-time {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 3px;
+}
+.rehearsal-banner .btn { position: relative; z-index: 1; }
+
+.rehearsal-edit-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.rehearsal-edit-input {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-family: inherit;
+}
+.rehearsal-edit-input:focus {
+  outline: none;
+  background: rgba(255,255,255,0.12);
+  border-color: var(--accent);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1200px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .event-card-head { padding: 16px 18px; gap: 14px; }
+  .event-title { font-size: 16px; }
+  .event-date { width: 48px; }
+  .event-date-day { font-size: 19px; }
+  .event-body-inner { padding: 0 18px; }
+  .event-card.open .event-body-inner { padding: 0 18px 18px; }
+  .event-divider { margin: 0 -18px 20px; }
+  .verse-text { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  .songs-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   EMPTY SCHEDULE STATE
+   ============================================================ */
+.empty-schedule {
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 56px 24px;
+  text-align: center;
+}
+.empty-schedule-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+}
+.empty-schedule-icon i { width: 28px; height: 28px; stroke-width: 1.6; }
+.empty-schedule h3 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.empty-schedule p {
+  color: var(--text-2);
+  font-size: 13px;
+  max-width: 360px;
+  margin: 0 auto;
+}

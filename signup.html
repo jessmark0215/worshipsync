@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up · WorshipSync</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <p class="auth-brand-name">WorshipSync</p>
+    </div>
+
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-sub">Join your worship team in just a moment.</p>
+
+    <div id="configWarning" class="config-warning" hidden>
+      <i data-lucide="alert-triangle"></i>
+      <div>
+        <strong>Firebase not configured</strong>
+        Edit <code>js/shared/firebase-config.js</code> with your project's values to enable signup.
+      </div>
+    </div>
+
+    <form class="auth-form" id="signupForm" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="name">Full name</label>
+        <div class="auth-input-wrap">
+          <i data-lucide="user" class="auth-input-icon"></i>
+          <input class="auth-input" id="name" type="text" autocomplete="name" required placeholder="Jane Doe" />
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="email">Email address</label>
+        <div class="auth-input-wrap">
+          <i data-lucide="mail" class="auth-input-icon"></i>
+          <input class="auth-input" id="email" type="email" autocomplete="email" required placeholder="you@church.org" />
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="password">
+          <span>Password</span>
+          <span id="strengthLabel" class="pwd-strength-label" hidden></span>
+        </label>
+        <div class="auth-input-wrap">
+          <i data-lucide="lock" class="auth-input-icon"></i>
+          <input class="auth-input" id="password" type="password" autocomplete="new-password" required placeholder="At least 8 characters" minlength="6" />
+          <button type="button" class="auth-show-pwd" id="togglePwd" aria-label="Show password">
+            <i data-lucide="eye"></i>
+          </button>
+        </div>
+        <div class="pwd-strength" id="pwdStrength" hidden>
+          <div class="pwd-strength-bar"></div>
+          <div class="pwd-strength-bar"></div>
+          <div class="pwd-strength-bar"></div>
+          <div class="pwd-strength-bar"></div>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="confirm">Confirm password</label>
+        <div class="auth-input-wrap">
+          <i data-lucide="lock-keyhole" class="auth-input-icon"></i>
+          <input class="auth-input" id="confirm" type="password" autocomplete="new-password" required placeholder="Re-enter password" />
+          <button type="button" class="auth-show-pwd" id="toggleConfirm" aria-label="Show password">
+            <i data-lucide="eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label">
+          <span>What do you play / lead?</span>
+          <span class="auth-label-hint" id="roleCount">Pick at least 1</span>
+        </label>
+        <div class="role-pick-grid" id="rolePickGrid">
+          <label class="role-pick"><input type="checkbox" name="role" value="Music Director" /><i data-lucide="crown"></i><span>Music Director</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Worship Leader" /><i data-lucide="mic-2"></i><span>Worship Leader</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Guitarist" /><i data-lucide="guitar"></i><span>Guitarist</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Bassist" /><i data-lucide="guitar"></i><span>Bassist</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Drummer" /><i data-lucide="drum"></i><span>Drummer</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Keys" /><i data-lucide="piano"></i><span>Keys</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Backup Singer" /><i data-lucide="mic"></i><span>Backup Singer</span></label>
+          <label class="role-pick"><input type="checkbox" name="role" value="Sound Man" /><i data-lucide="sliders-horizontal"></i><span>Sound Man</span></label>
+        </div>
+      </div>
+
+      <div id="signupError" class="auth-error" hidden>
+        <i data-lucide="alert-circle"></i>
+        <span id="signupErrorText"></span>
+      </div>
+
+      <button type="submit" class="auth-submit" id="submitBtn">
+        <span id="submitText">Create account</span>
+        <i data-lucide="arrow-right" id="submitIcon"></i>
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <p class="auth-switch">
+      Already have an account? <a href="login.html">Log in</a>
+    </p>
+  </div>
+
+    <script type="module">
+      import { initFirebase, signUp, friendlyAuthError, onAuthReady } from './js/shared/auth.js';
+      import { isFirebaseConfigured } from './js/shared/firebase-config.js';
+
+      if (window.lucide) window.lucide.createIcons();
+
+      if (!isFirebaseConfigured()) {
+        document.getElementById('configWarning').hidden = false;
+      }
+
+      // If already logged in, redirect
+      if (isFirebaseConfigured()) {
+        onAuthReady((user) => {
+          if (user && user.emailVerified) {
+            location.href = 'index.html';
+          } else if (user && !user.emailVerified) {
+            location.href = 'verify-email.html';
+          }
+        });
+      }
+
+      // Password visibility toggles
+      function bindToggle(toggleId, inputId) {
+        const inp = document.getElementById(inputId);
+        const btn = document.getElementById(toggleId);
+        btn.addEventListener('click', () => {
+          const wasPwd = inp.type === 'password';
+          inp.type = wasPwd ? 'text' : 'password';
+          btn.innerHTML = `<i data-lucide="${wasPwd ? 'eye-off' : 'eye'}"></i>`;
+          if (window.lucide) window.lucide.createIcons();
+        });
+      }
+      bindToggle('togglePwd', 'password');
+      bindToggle('toggleConfirm', 'confirm');
+
+      // Password strength meter
+      const pwdInput = document.getElementById('password');
+      const strengthBars = document.querySelectorAll('#pwdStrength .pwd-strength-bar');
+      const strengthLabel = document.getElementById('strengthLabel');
+      const strengthWrap = document.getElementById('pwdStrength');
+
+      function scorePwd(pwd) {
+        if (!pwd) return 0;
+        let score = 0;
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 10) score++;
+        if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+        if (/\d/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score++;
+        return Math.min(score, 4);
+      }
+      pwdInput.addEventListener('input', () => {
+        const score = scorePwd(pwdInput.value);
+        strengthWrap.hidden = score === 0;
+        strengthBars.forEach((bar, i) => {
+          bar.classList.remove('weak', 'medium', 'strong');
+          if (i < score) {
+            bar.classList.add(score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong');
+          }
+        });
+        const labels = { 1: 'Weak', 2: 'Fair', 3: 'Good', 4: 'Strong' };
+        strengthLabel.textContent = labels[score] || '';
+        strengthLabel.hidden = !labels[score];
+        strengthLabel.classList.remove('weak', 'medium', 'strong');
+        if (score <= 1) strengthLabel.classList.add('weak');
+        else if (score <= 2) strengthLabel.classList.add('medium');
+        else strengthLabel.classList.add('strong');
+      });
+
+      // Submit
+      const form = document.getElementById('signupForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+      const submitIcon = document.getElementById('submitIcon');
+      const errorBox = document.getElementById('signupError');
+      const errorText = document.getElementById('signupErrorText');
+
+      function showError(msg) {
+        errorText.textContent = msg;
+        errorBox.hidden = false;
+      }
+      function clearError() { errorBox.hidden = true; }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        if (loading) {
+          submitText.textContent = 'Creating account…';
+          submitIcon.outerHTML = '<span class="spinner" id="submitIcon"></span>';
+        } else {
+          submitText.textContent = 'Create account';
+          document.getElementById('submitIcon').outerHTML = '<i data-lucide="arrow-right" id="submitIcon"></i>';
+          if (window.lucide) window.lucide.createIcons();
+        }
+      }
+
+      // Role picker — keep a live counter and lock the "at least one" requirement
+      const roleHint = document.getElementById('roleCount');
+      const roleInputs = document.querySelectorAll('input[name="role"]');
+      function updateRoleCount() {
+        const n = document.querySelectorAll('input[name="role"]:checked').length;
+        if (n === 0) {
+          roleHint.textContent = 'Pick at least 1';
+          roleHint.classList.remove('ok');
+        } else {
+          roleHint.textContent = `${n} selected`;
+          roleHint.classList.add('ok');
+        }
+      }
+      roleInputs.forEach(inp => inp.addEventListener('change', updateRoleCount));
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+        if (!isFirebaseConfigured()) {
+          showError('Firebase isn\'t configured yet. See the warning above.');
+          return;
+        }
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = pwdInput.value;
+        const confirm = document.getElementById('confirm').value;
+        const roles = Array.from(document.querySelectorAll('input[name="role"]:checked')).map(el => el.value);
+
+        if (!name || !email || !password || !confirm) {
+          showError('Please fill in all fields.');
+          return;
+        }
+        if (password.length < 6) {
+          showError('Password must be at least 6 characters.');
+          return;
+        }
+        if (password !== confirm) {
+          showError('Passwords don\'t match.');
+          document.getElementById('confirm').classList.add('error');
+          return;
+        }
+        if (roles.length === 0) {
+          showError('Pick at least one role you play or lead.');
+          return;
+        }
+
+        setLoading(true);
+        try {
+          await signUp({ name, email, password, roles });
+          // Stash data so verify-email page can show it
+          try {
+            sessionStorage.setItem('worshipsync.pendingSignup', JSON.stringify({ name, email, roles }));
+          } catch (_) {}
+          location.href = 'verify-email.html';
+        } catch (err) {
+          showError(friendlyAuthError(err));
+          setLoading(false);
+        }
+      });
+
+      if (isFirebaseConfigured()) {
+        initFirebase().catch(() => {});
+      }
+    </script>
+</body>
+</html>

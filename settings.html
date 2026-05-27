@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings · WorshipSync</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+  <link rel="stylesheet" href="css/pages/settings.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <p class="brand-name">WorshipSync</p>
+        <button class="icon-btn sidebar-close" id="sidebarClose" aria-label="Close menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <p class="nav-section-label">Workspace</p>
+      <nav class="nav" aria-label="Primary">
+        <a class="nav-item" href="index.html" data-page="my-schedules">
+          <i data-lucide="calendar-check-2"></i>
+          <span>My schedules</span>
+        </a>
+        <a class="nav-item" href="calendar.html" data-page="calendar">
+          <i data-lucide="calendar-days"></i>
+          <span>Calendar of events</span>
+        </a>
+        <a class="nav-item" href="studio.html" data-page="studio">
+          <i data-lucide="audio-waveform"></i>
+          <span>Audio studio</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+
+      <p class="nav-section-label">Account</p>
+      <nav class="nav" aria-label="Secondary">
+        <a class="nav-item" href="settings.html" data-page="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+        <a class="nav-item" href="help.html" data-page="help">
+          <i data-lucide="info"></i>
+          <span>Help</span>
+        </a>
+      </nav>
+
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuOpen" aria-label="Open menu">
+          <i data-lucide="menu"></i>
+        </button>
+
+        <div class="topbar-title-wrap">
+          <h2 class="topbar-title">Settings</h2>
+        </div>
+
+        <div class="search-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search..." />
+        </div>
+
+        <div class="topbar-user">
+          <div class="topbar-user-text">
+            <p class="topbar-user-name">Loading…</p>
+            <p class="topbar-user-role"></p>
+          </div>
+          <div class="avatar avatar-md avatar-bordered">·</div>
+          <button class="icon-btn notif-btn" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+            <span class="notif-badge">3</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page">
+        <div id="settingsRoot"></div>
+      </div>
+    </main>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  </div>
+
+  <script type="module">
+    import { initShell } from './js/shared/shell.js';
+    import { currentUser, updateMyProfile, INSTRUMENT_ROLES } from './js/shared/data.js';
+    import { $, esc, showToast } from './js/shared/ui.js';
+
+    (async () => {
+      await initShell();
+      render();
+    })();
+
+    function render() {
+      const root = $('#settingsRoot');
+      const me = currentUser;
+      if (!me) {
+        root.innerHTML = `<p>Not signed in.</p>`;
+        return;
+      }
+      const allRoles = INSTRUMENT_ROLES || [
+        'Music Director', 'Worship Leader', 'Guitarist', 'Bassist',
+        'Drummer', 'Keys', 'Backup Singer', 'Sound Man'
+      ];
+      const myRoles = new Set(me.roles || []);
+
+      root.innerHTML = `
+        <div class="page-head">
+          <h1 class="page-greeting">Settings</h1>
+          <p class="page-sub">Update your profile and the roles you play or lead.</p>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-row">
+            <div class="avatar avatar-lg avatar-${esc(me.color || 'green')}">${esc(me.initials || '?')}</div>
+            <div>
+              <p class="settings-name">${esc(me.name || '')}</p>
+              <p class="settings-email">${esc(me.email || '')}</p>
+            </div>
+          </div>
+
+          <div class="settings-field">
+            <label class="settings-label">Full name</label>
+            <input class="settings-input" id="nameInput" type="text" value="${esc(me.name || '')}" />
+          </div>
+
+          <div class="settings-field">
+            <label class="settings-label">
+              What do you play / lead? <span class="settings-hint" id="roleHint">${myRoles.size} selected</span>
+            </label>
+            <p class="settings-help">These determine which dropdowns you appear in (Music Director, Worship Leader, instrumentalist pickers).</p>
+            <div class="role-pick-grid" id="roleGrid">
+              ${allRoles.map(r => `
+                <label class="role-pick">
+                  <input type="checkbox" name="role" value="${esc(r)}" ${myRoles.has(r) ? 'checked' : ''} />
+                  <i data-lucide="${roleIcon(r)}"></i>
+                  <span>${esc(r)}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+
+          <div id="saveError" class="settings-error" hidden></div>
+
+          <button class="btn btn-primary" id="saveBtn">
+            <i data-lucide="check"></i>Save changes
+          </button>
+        </div>
+      `;
+
+      if (window.lucide) window.lucide.createIcons();
+
+      // Update count hint as user toggles roles
+      const hint = $('#roleHint');
+      document.querySelectorAll('input[name="role"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const n = document.querySelectorAll('input[name="role"]:checked').length;
+          hint.textContent = `${n} selected`;
+        });
+      });
+
+      $('#saveBtn').addEventListener('click', onSave);
+    }
+
+    function roleIcon(r) {
+      const map = {
+        'Music Director': 'crown',
+        'Worship Leader': 'mic-2',
+        'Guitarist': 'guitar',
+        'Bassist': 'guitar',
+        'Drummer': 'drum',
+        'Keys': 'piano',
+        'Backup Singer': 'mic',
+        'Sound Man': 'sliders-horizontal',
+      };
+      return map[r] || 'tag';
+    }
+
+    async function onSave() {
+      const errEl = $('#saveError');
+      errEl.hidden = true;
+      const name = $('#nameInput').value.trim();
+      const roles = Array.from(document.querySelectorAll('input[name="role"]:checked')).map(el => el.value);
+      if (!name) {
+        errEl.textContent = 'Name cannot be empty.';
+        errEl.hidden = false;
+        return;
+      }
+      const btn = $('#saveBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" style="animation:spin 1s linear infinite"></i>Saving…`;
+      if (window.lucide) window.lucide.createIcons();
+
+      const result = await updateMyProfile({ name, roles });
+      if (result.ok) {
+        showToast('Profile saved');
+        // Re-render to reflect any changes
+        render();
+      } else {
+        errEl.textContent = `Failed to save: ${result.error || result.reason || 'unknown error'}`;
+        errEl.hidden = false;
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check"></i>Save changes`;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>
