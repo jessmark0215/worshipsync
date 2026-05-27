@@ -1,0 +1,297 @@
+/* ============================================================
+   WORSHIPSYNC · pages/admin-overview.css
+   Admin overview dashboard
+   ============================================================ */
+
+/* Admin gate (shown to non-admins) */
+.admin-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px;
+}
+.admin-gate-icon {
+  width: 84px; height: 84px;
+  border-radius: var(--r-lg);
+  background: var(--rose-soft);
+  color: var(--rose);
+  display: grid; place-items: center;
+  margin-bottom: 24px;
+}
+.admin-gate-icon i { width: 36px; height: 36px; stroke-width: 1.6; }
+.admin-gate h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.admin-gate p {
+  color: var(--text-2);
+  font-size: 14px;
+  max-width: 360px;
+  margin-bottom: 24px;
+}
+
+/* ============================================================
+   ADMIN PAGE HEADER
+   ============================================================ */
+.admin-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.admin-head-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.admin-head-sub {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+.admin-head-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border-radius: var(--r-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stat-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.stat-icon i { width: 18px; height: 18px; stroke-width: 1.8; }
+.stat-icon.purple { background: var(--accent-soft); color: var(--accent); }
+.stat-icon.green  { background: var(--green-soft); color: #065F46; }
+.stat-icon.amber  { background: var(--amber-soft); color: #92400E; }
+.stat-icon.blue   { background: var(--blue-soft); color: #1E40AF; }
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  line-height: 1.1;
+}
+.stat-trend {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stat-trend.up { color: #065F46; }
+.stat-trend.down { color: #9F1239; }
+.stat-trend i { width: 12px; height: 12px; }
+
+/* Two-column grid */
+.admin-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Online users card */
+.online-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.online-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+}
+.online-row.is-online {
+  background: white;
+  border-color: var(--border-mid);
+}
+.online-status {
+  position: relative;
+}
+.online-status-dot {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--text-3);
+  border: 2px solid white;
+}
+.online-row.is-online .online-status-dot { background: var(--green); }
+.online-meta {
+  flex: 1;
+  min-width: 0;
+}
+.online-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  line-height: 1.2;
+}
+.online-sub {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.online-time {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+/* Activity / event status overview */
+.event-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.event-status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+}
+.event-status-date {
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+  padding: 6px 0;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.event-status-month {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.event-status-day {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1;
+}
+.event-status-body { flex: 1; min-width: 0; }
+.event-status-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-status-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+.event-status-meta strong { color: var(--text-2); font-weight: 600; }
+
+/* Quick actions card */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text-1);
+  transition: all 0.15s;
+  font-family: inherit;
+  text-align: left;
+}
+.quick-action:hover {
+  background: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.quick-action-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid; place-items: center;
+}
+.quick-action-icon i { width: 16px; height: 16px; }
+.quick-action-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.quick-action-sub {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: 1fr; }
+}

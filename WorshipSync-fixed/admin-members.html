@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Members · WorshipSync</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/admin-overview.css">
+  <link rel="stylesheet" href="css/pages/admin-members.css">
+</head>
+<body>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <p class="brand-name">WorshipSync</p>
+        <button class="icon-btn sidebar-close" id="sidebarClose" aria-label="Close menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <p class="nav-section-label">Workspace</p>
+      <nav class="nav" aria-label="Primary">
+        <a class="nav-item" href="index.html" data-page="my-schedules">
+          <i data-lucide="calendar-check-2"></i>
+          <span>My schedules</span>
+        </a>
+        <a class="nav-item" href="calendar.html" data-page="calendar">
+          <i data-lucide="calendar-days"></i>
+          <span>Calendar of events</span>
+        </a>
+        <a class="nav-item" href="studio.html" data-page="studio">
+          <i data-lucide="audio-waveform"></i>
+          <span>Audio studio</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+
+      <p class="nav-section-label">Account</p>
+      <nav class="nav" aria-label="Secondary">
+        <a class="nav-item" href="settings.html" data-page="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+        <a class="nav-item" href="help.html" data-page="help">
+          <i data-lucide="info"></i>
+          <span>Help</span>
+        </a>
+      </nav>
+      <!-- Admin nav is injected by shell.js -->
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuOpen" aria-label="Open menu">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="topbar-title-wrap">
+          <h2 class="topbar-title">Members</h2>
+        </div>
+        <div class="search-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search songs, events..." />
+        </div>
+        <div class="topbar-user">
+          <div class="topbar-user-text">
+            <p class="topbar-user-name">Loading…</p>
+            <p class="topbar-user-role"></p>
+          </div>
+          <div class="avatar avatar-md avatar-bordered">·</div>
+          <button class="icon-btn notif-btn" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+            <span class="notif-badge">3</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page" id="page"></div>
+    </main>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  </div>
+
+  <script type="module" src="js/pages/admin-members.js"></script>
+</body>
+</html>

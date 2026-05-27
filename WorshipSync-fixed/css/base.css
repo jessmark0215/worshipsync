@@ -1,0 +1,96 @@
+/* ============================================================
+   WORSHIPSYNC · base.css
+   Reset, design tokens, typography. Loaded on every page.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html, body { height: 100%; }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+input, select, textarea { font: inherit; }
+a { color: inherit; text-decoration: none; }
+[hidden] { display: none !important; }
+
+/* ===== Design tokens ===== */
+:root {
+  /* Surfaces */
+  --bg: #F4F4F8;
+  --card: #FFFFFF;
+  --card-soft: #FAFAFC;
+
+  /* Sidebar */
+  --sidebar: #15131F;
+  --sidebar-soft: #1E1B2C;
+  --sidebar-border: rgba(255,255,255,0.06);
+
+  /* Text */
+  --text-1: #15131F;
+  --text-2: #5A5670;
+  --text-3: #9590A8;
+  --text-on-dark: #FFFFFF;
+  --text-on-dark-2: rgba(255,255,255,0.6);
+  --text-on-dark-3: rgba(255,255,255,0.35);
+
+  /* Accent — vibrant purple */
+  --accent: #7C5BF2;
+  --accent-deep: #5E3FCF;
+  --accent-soft: #EFEAFE;
+  --accent-text: #4C2DB8;
+
+  /* Semantic */
+  --green: #10B981;
+  --green-soft: #D1FAE5;
+  --amber: #F59E0B;
+  --amber-soft: #FEF3C7;
+  --rose: #F43F5E;
+  --rose-soft: #FFE4E6;
+  --blue: #3B82F6;
+  --blue-soft: #DBEAFE;
+  --teal: #14B8A6;
+  --teal-soft: #CCFBF1;
+
+  /* Borders */
+  --border: #ECEAF3;
+  --border-mid: #DCDAE7;
+
+  /* Radius */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 999px;
+
+  /* Shadow */
+  --shadow-xs: 0 1px 2px rgba(21, 19, 31, 0.04);
+  --shadow-sm: 0 2px 6px rgba(21, 19, 31, 0.04), 0 1px 2px rgba(21, 19, 31, 0.03);
+  --shadow-md: 0 8px 24px rgba(21, 19, 31, 0.06), 0 2px 6px rgba(21, 19, 31, 0.03);
+  --shadow-lg: 0 24px 48px rgba(21, 19, 31, 0.1);
+  --shadow-purple: 0 8px 24px rgba(124, 91, 242, 0.25);
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --topbar-h: 88px;
+  --gap: 20px;
+
+  /* Type */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-1);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: var(--accent-soft); color: var(--accent-text); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
