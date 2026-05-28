@@ -658,7 +658,12 @@ function openAddSongModal(eventId) {
           id: uid(),
           title, artist: artist || '', key, link: link || '—',
           color: colors[event.setlist.length % colors.length],
-          audioFile: null,
+          // Studio fields — populated later from the Audio Studio page.
+          audioFile: null,         // { name, size, type, url, path }
+          chordChart: '',          // free-text chord chart in `key`
+          chordChartImage: null,   // { name, url, path }
+          mdNotes: '',             // free-text notes from the Music Director
+          stems: null,             // { vocals, drums, bass, other } each = { url, path }
         });
         persistEvent(event.id);
         notif({

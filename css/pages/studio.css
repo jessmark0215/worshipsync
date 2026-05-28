@@ -1,0 +1,627 @@
+/* ============================================================
+   WORSHIPSYNC · pages/studio.css
+   Audio Studio — practice tools layout.
+   ============================================================ */
+
+/* ===========================================================
+   Two-pane layout: song list (left) + workspace (right)
+   =========================================================== */
+.studio-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ----- Song list sidebar ----- */
+.studio-side {
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - var(--topbar-h) - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.studio-side-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.studio-side-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+.studio-side-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.studio-side-list {
+  overflow-y: auto;
+  padding: 8px;
+  flex: 1;
+}
+
+.studio-side-group { margin-bottom: 6px; }
+.studio-side-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 10px 6px;
+}
+.studio-side-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-side-group-date {
+  font-size: 10px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.studio-side-songs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.studio-side-song {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r-md);
+  text-align: left;
+  transition: background 0.12s;
+}
+.studio-side-song:hover { background: var(--card-soft); }
+.studio-side-song.is-active { background: var(--accent-soft); }
+.studio-side-song-dot {
+  width: 8px; height: 8px; border-radius: var(--r-full);
+  background: var(--song-color, var(--accent));
+  flex-shrink: 0;
+}
+.studio-side-song-body { flex: 1; min-width: 0; }
+.studio-side-song-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-side-song.is-active .studio-side-song-title { color: var(--accent-text); }
+.studio-side-song-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+.studio-side-song-badge { display: inline-flex; }
+.studio-side-song-badge i { width: 11px; height: 11px; }
+
+.studio-side-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-3);
+}
+.studio-side-empty i { width: 28px; height: 28px; margin-bottom: 10px; stroke-width: 1.5; }
+.studio-side-empty p { font-size: 12px; line-height: 1.5; }
+
+/* ----- Workspace ----- */
+.studio-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Empty state */
+.studio-empty {
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 72px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.studio-empty-icon {
+  width: 64px; height: 64px;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid; place-items: center;
+  margin-bottom: 16px;
+}
+.studio-empty-icon i { width: 30px; height: 30px; }
+.studio-empty h3 { font-size: 18px; font-weight: 700; color: var(--text-1); margin-bottom: 6px; }
+.studio-empty p { font-size: 13px; color: var(--text-2); max-width: 420px; line-height: 1.5; }
+
+/* ===========================================================
+   Song header
+   =========================================================== */
+.studio-song-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 24px;
+}
+.studio-song-head-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.studio-song-color-mark {
+  width: 6px;
+  align-self: stretch;
+  min-height: 44px;
+  border-radius: var(--r-full);
+  background: var(--song-color, var(--accent));
+  flex-shrink: 0;
+}
+.studio-song-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  line-height: 1.1;
+}
+.studio-song-sub { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+.studio-song-event-link { color: var(--accent-text); font-weight: 600; }
+.studio-song-event-link:hover { text-decoration: underline; }
+.studio-song-event-date { color: var(--text-3); }
+.studio-song-head-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.studio-song-key-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--r-full);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.studio-song-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--r-full);
+  background: var(--amber-soft);
+  color: #92400E;
+}
+.studio-song-role-pill i { width: 13px; height: 13px; }
+.studio-song-role-pill.view-only { background: var(--card-soft); color: var(--text-2); }
+
+/* ===========================================================
+   Cards (shared chrome)
+   =========================================================== */
+.studio-player-card,
+.studio-chord-card,
+.studio-stems-card {
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 24px;
+}
+/* Icon inside a studio card title (scoped so it doesn't affect other pages) */
+.studio-player-card .card-title i,
+.studio-chord-card .card-title i,
+.studio-stems-card .card-title i {
+  width: 16px; height: 16px;
+  vertical-align: -3px;
+  margin-right: 6px;
+  color: var(--accent);
+}
+
+/* .modal-help lives in admin-events.css which isn't loaded on this page,
+   so provide a local copy for the edit-chords modal. */
+.modal-help {
+  font-size: 11px;
+  color: var(--text-3);
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+
+/* ===========================================================
+   AUDIO PLAYER
+   =========================================================== */
+.studio-player { margin-top: 8px; }
+
+.studio-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.studio-transport-btn {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: var(--card-soft);
+  color: var(--text-2);
+  display: grid; place-items: center;
+  transition: all 0.15s;
+}
+.studio-transport-btn:hover { background: var(--border); color: var(--text-1); }
+.studio-transport-btn i { width: 18px; height: 18px; }
+.studio-transport-btn.primary {
+  width: 56px; height: 56px;
+  background: var(--accent);
+  color: white;
+  box-shadow: var(--shadow-purple);
+}
+.studio-transport-btn.primary:hover { background: var(--accent-deep); }
+.studio-transport-btn.primary i { width: 24px; height: 24px; }
+.studio-transport-btn.is-on { background: var(--accent); color: white; }
+
+.studio-scrub {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.studio-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  min-width: 38px;
+  text-align: center;
+}
+.studio-scrub-input { flex: 1; }
+
+/* Range input styling (shared by scrub + control sliders) */
+.studio-scrub-input,
+.studio-control-input {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+.studio-scrub-input::-webkit-slider-thumb,
+.studio-control-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: var(--r-full);
+  background: var(--accent);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  border: 2px solid white;
+}
+.studio-scrub-input::-moz-range-thumb,
+.studio-control-input::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: var(--r-full);
+  background: var(--accent);
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+.studio-controls-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.studio-control-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+.studio-control-label i { width: 14px; height: 14px; }
+.studio-control-value {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-text);
+}
+.studio-control-input { width: 100%; }
+.studio-control-presets {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.studio-preset-btn {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: white;
+  color: var(--text-2);
+  transition: all 0.12s;
+}
+.studio-preset-btn:hover { border-color: var(--border-mid); color: var(--text-1); }
+.studio-preset-btn.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.studio-engine-note {
+  font-size: 11px;
+  color: var(--amber);
+  margin-top: 14px;
+  text-align: center;
+  min-height: 14px;
+}
+
+.studio-no-audio {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+  background: var(--card-soft);
+  border-radius: var(--r-md);
+  margin-top: 8px;
+}
+
+/* ===========================================================
+   CHORD PANEL
+   =========================================================== */
+.studio-chord-tabs {
+  display: inline-flex;
+  background: var(--card-soft);
+  border-radius: var(--r-full);
+  padding: 3px;
+  gap: 2px;
+}
+.studio-chord-tab {
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: all 0.12s;
+}
+.studio-chord-tab:hover { color: var(--text-1); }
+.studio-chord-tab.is-active {
+  background: white;
+  color: var(--accent-text);
+  box-shadow: var(--shadow-xs);
+}
+.studio-chord-body { margin-top: 16px; }
+
+.studio-chord-display {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-1);
+  background: var(--card-soft);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.studio-chord-empty {
+  color: var(--text-3);
+  font-size: 13px;
+  font-style: italic;
+  padding: 16px 0;
+}
+.studio-chord-foot {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.studio-chord-image-wrap {
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--card-soft);
+  text-align: center;
+}
+.studio-chord-image {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+.studio-chord-pdf {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+.studio-chord-notes-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-1);
+  background: var(--card-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  resize: vertical;
+}
+.studio-chord-notes-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: white;
+}
+.studio-notes-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 8px;
+}
+.studio-notes-hint i { width: 12px; height: 12px; }
+.studio-chord-notes-display {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-1);
+  background: var(--card-soft);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+}
+
+/* ===========================================================
+   STEMS PANEL
+   =========================================================== */
+.studio-stems-body { margin-top: 8px; }
+.studio-stems-blurb {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.studio-stems-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.studio-stem-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--card-soft);
+}
+.studio-stem-slot.has-stem { background: white; border-color: var(--accent-soft); }
+.studio-stem-slot-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--r-md);
+  background: white;
+  display: grid; place-items: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.studio-stem-slot.has-stem .studio-stem-slot-icon { background: var(--accent-soft); color: var(--accent); }
+.studio-stem-slot-icon i { width: 17px; height: 17px; }
+.studio-stem-slot-body { flex: 1; min-width: 0; }
+.studio-stem-slot-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.studio-stem-slot-empty { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.studio-stem-audio {
+  width: 100%;
+  height: 32px;
+  margin-top: 6px;
+}
+.studio-stem-slot-upload {
+  width: 32px; height: 32px;
+  border-radius: var(--r-sm);
+  background: white;
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  cursor: pointer;
+  color: var(--text-2);
+  flex-shrink: 0;
+  transition: all 0.12s;
+}
+.studio-stem-slot-upload:hover { border-color: var(--accent); color: var(--accent); }
+.studio-stem-slot-upload i { width: 14px; height: 14px; }
+
+/* ===========================================================
+   SETLIST NAV
+   =========================================================== */
+.studio-setlist-nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+.studio-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: white;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+  transition: all 0.15s;
+  min-width: 0;
+}
+.studio-nav-btn:not([disabled]):hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.studio-nav-btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+.studio-nav-btn-right { justify-content: flex-end; text-align: right; }
+.studio-nav-btn i { width: 20px; height: 20px; color: var(--accent); flex-shrink: 0; }
+.studio-nav-btn span { display: flex; flex-direction: column; min-width: 0; }
+.studio-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.studio-nav-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-nav-empty { font-size: 13px; color: var(--text-3); }
+.studio-nav-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  background: var(--sidebar);
+  border-radius: var(--r-lg);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.studio-nav-counter-sub {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-on-dark-3);
+  margin-top: 2px;
+}
+
+/* ===========================================================
+   Responsive
+   =========================================================== */
+@media (max-width: 1000px) {
+  .studio-layout { grid-template-columns: 1fr; }
+  .studio-side {
+    position: static;
+    max-height: 280px;
+  }
+}
+@media (max-width: 640px) {
+  .studio-controls-row { grid-template-columns: 1fr; gap: 18px; }
+  .studio-stems-grid { grid-template-columns: 1fr; }
+  .studio-song-head { padding: 16px; }
+  .studio-song-title { font-size: 19px; }
+  .studio-player-card, .studio-chord-card, .studio-stems-card { padding: 16px; }
+  .studio-setlist-nav { grid-template-columns: 1fr; }
+  .studio-nav-counter { order: -1; flex-direction: row; gap: 8px; }
+  .studio-nav-counter-sub { margin-top: 0; }
+}

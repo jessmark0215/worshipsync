@@ -864,6 +864,30 @@ export function updateEvent(eventId, patch) {
   return { ok: true, event: ev };
 }
 
+// Patch any field on a song nested inside an event's setlist.
+// Used by the Audio Studio (chord text edits, audio metadata, MD notes,
+// stem URLs, etc). The whole event is persisted back to Firestore because
+// setlist items live as an array on the event doc.
+export function updateSong(eventId, songId, patch) {
+  const ev = _state.events.find(e => e.id === eventId);
+  if (!ev) return { ok: false, reason: 'event_not_found' };
+  const song = (ev.setlist || []).find(s => s.id === songId);
+  if (!song) return { ok: false, reason: 'song_not_found' };
+  Object.assign(song, patch);
+  persistEvent(ev.id);
+  return { ok: true, event: ev, song };
+}
+
+// Find a song by id across every event. Returns { event, song } or null.
+// Used by the Audio Studio when a deep link arrives (?song=ID).
+export function findSongById(songId) {
+  for (const ev of _state.events) {
+    const song = (ev.setlist || []).find(s => s.id === songId);
+    if (song) return { event: ev, song };
+  }
+  return null;
+}
+
 // Delete an event entirely (admin only)
 export function deleteEvent(eventId) {
   const idx = _state.events.findIndex(e => e.id === eventId);
